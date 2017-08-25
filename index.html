@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Note</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<script type="text/javascript" src="js/db.js"></script>
+	<script type="text/javascript" src="js/start.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="controls">
+			<input type="text" name="s" class="input controls__stretch">
+			<button class="button">поиск</button>
+			<button class="button">добавить запись</button>
+		</div>
+	</div>
+	<div class="mask"></div>
+	<div class="popup">
+		<label for="lastname">Фамилия</label>
+		<input type="text" name="lastname">
+		<label for="firstname">Имя</label>
+		<input type="text" name="firstname">
+		<label for="phone">Телефон</label>
+		<input type="text" name="phone">
+		<label for="note">Примечание<label>
+		<textarea name="note"></textarea>
+		<input type="submit" name="" value="сохранить">
+	</div>
+	<script type="text/javascript">
+		window.app = new note.Start();
+	</script>
+</body>
+</html>
