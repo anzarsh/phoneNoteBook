@@ -1,0 +1,16 @@
+.note {
+
+}
+
+.note__item {
+	padding: 15px;
+	background: #ccc;
+	border-right: 1px solid white;
+	border-left: 1px solid white;
+	&:first-child {
+		border-left: 0;
+	}
+	&:last-child {
+		border-right: 0;
+	}
+}

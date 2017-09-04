@@ -8,25 +8,17 @@
 	<script type="text/javascript" src="js/componentLoader.js"></script>
 	<script type="text/javascript" src="js/db.js"></script>
 	<script type="text/javascript" src="js/start.js"></script>
+	<script type="text/javascript">
+		window.addEventListener("DOMContentLoaded", function(){
+			window.app = new note.Start();
+		}, false);
+	</script>
 </head>
 <body>
-	<div class="container" component="controls">
-		
-	</div>
-	<div class="mask"></div>
-	<div class="popup">
-		<label for="lastname">Фамилия</label>
-		<input type="text" name="lastname">
-		<label for="firstname">Имя</label>
-		<input type="text" name="firstname">
-		<label for="phone">Телефон</label>
-		<input type="text" name="phone">
-		<label for="note">Примечание<label>
-		<textarea name="note"></textarea>
-		<input type="submit" name="" value="сохранить">
-	</div>
-	<script type="text/javascript">
-		window.app = new note.Start();
-	</script>
+
+	<section class="container" component="controls"></section>
+	<section class="container" component="note-list"></section>
+	<section class="container" component="popup-add-note"></section>
+	
 </body>
 </html>

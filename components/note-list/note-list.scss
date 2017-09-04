@@ -1,0 +1,20 @@
+.note-list {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.note-list__head {
+	padding: 15px;
+	background: orange;
+	border-right: 1px solid white;
+	border-left: 1px solid white;
+	border-bottom: 1px solid gray;
+	font: normal normal 18px/1.2 Arial, sans-serif;
+	color: white;
+	&:first-child {
+		border-left: 0;
+	}
+	&:last-child {
+		border-right: 0;
+	}
+}
