@@ -11,7 +11,9 @@
 		var self = this;
 		xhr.open("GET", path + "/" + xhr.name + ".html", true);
 		// xhr.responseType = "document";
-		xhr.overrideMimeType("text/plain; charset=utf-8");
+		try {
+			xhr.overrideMimeType("text/plain; charset=utf-8");
+		}catch(e){}
 		xhr.onreadystatechange = function(e){
 			if(this.readyState != 4) return;
 			if(this.status == 404){
@@ -56,7 +58,9 @@
 	ComponentLoader.prototype._loadCSS = function(xhr, path){
 		var self = this;
 		xhr.open("GET", path + "/" + xhr.name + ".css", true);
-		xhr.overrideMimeType("text/plain; charset=utf-8");
+		try {
+			xhr.overrideMimeType("text/plain; charset=utf-8");
+		}catch(e){}
 		xhr.onreadystatechange = function(e){
 			if(this.readyState != 4) return;
 			if(this.status == 404){
@@ -79,7 +83,9 @@
 	ComponentLoader.prototype._loadJS = function(xhr, path){
 		var self = this;
 		xhr.open("GET", path + "/" + xhr.name + ".js", true);
-		xhr.overrideMimeType("text/plain; charset=utf-8");
+		try {
+			xhr.overrideMimeType("text/plain; charset=utf-8");
+		}catch(e){}
 		xhr.onreadystatechange = function(e){
 			if(this.readyState != 4) return;
 			if(this.status == 404){
@@ -134,6 +140,10 @@
 
 	/*method of insert styles and html*/
 
+	ComponentLoader.prototype.setData = function(elem, data){
+		
+	};
+
 	ComponentLoader.prototype.insertStyles = function(){
 		
 		var styles = "";
@@ -153,21 +163,73 @@
 
 		var components = this.components;
 
+
+		//clear components in html
 		var outerComponents = elem.querySelectorAll("[component]");
 
+		for (var i=0; i<outerComponents.length; i++) {
+
+			var currentComponent = outerComponents[i];
+			while(currentComponent.hasChildNodes())
+				currentComponent.removeChild(currentComponent.firstChild);
+
+		}
+
+
+		//add quick links to data components
+		var elements = elem.querySelectorAll("[element]");
+
+		elem.elements = {};
+
+		for (var i=0; i<elements.length; i++) {
+			var elementName = elements[i].getAttribute("element");
+			elem.elements[elementName] = elements[i];
+		}
+
+
+		//add quick links to event components
+		// var eventComponents = elem.querySelectorAll("[component-event]");
+
+		// elem.comEvents = {};
+
+		// for (var i=0; i<eventComponents.length; i++) {
+		// 	var compEventName = eventComponents[i].getAttribute("component-event");
+		// 	elem.comEvents[compEventName] = eventComponents[i];
+		// }
+
+		// if(elem.js && elem.js.addEvents)
+		// 		elem.js.addEvents();
+
+
+		//constructing componet object model (COM) tree
 		elem.comNodes = [];
 
 		elem.comNode = {};
 
-		for (var i=0; i<outerComponents.length; i++){
+		for (var i=0; i<outerComponents.length; i++) {
 
 			var compName = outerComponents[i].getAttribute("component");
 			outerComponents[i].appendChild(components[compName].html.cloneNode(true));
 			elem.comNode[compName] = outerComponents[i].lastChild;
 			elem.comNodes.push(outerComponents[i].lastChild);
+			elem.comNode[compName].js = new components[compName].constructor();
+			elem.comNode[compName].js.html = elem.comNode[compName];
+			elem.comNode[compName].parentCom = elem;
 			this.insertHTML(outerComponents[i].lastChild);
+
 		}
 
+	};
+
+	ComponentLoader.prototype.addEvents = function(elem){
+
+		if(elem.js && elem.js.addEvents)
+			elem.js.addEvents();
+
+		for(var i=0; i<elem.comNodes.length; i++){
+			this.addEvents(elem.comNodes[i]);
+		}
+		
 	};
 
 	ComponentLoader.prototype.insertIn = function(elem){
@@ -177,10 +239,12 @@
 		this.COM = elem; // component object model
 
 		this.insertHTML(this.COM);
+
+		this.addEvents(this.COM);
 		
 	};
 
-	/*method of insert styles and html*/
+	/*method of insert styles and html-components*/
 
 
 
@@ -206,7 +270,7 @@
 	};
 
 	ComponentLoader.prototype.emit = function(eventName, data){
-	  return this.dispatchEvent(new CustomEvent(eventName, {
+	  return this.html.dispatchEvent(new CustomEvent(eventName, {
 	  	bubbles: true,
 	  	cancelable: true,
 	  	detail: data
@@ -214,6 +278,8 @@
 	};
 
 	/*adds custom events for ie9-11*/
+
+
 
 	window.note = window.note || {};
 	window.note.ComponentLoader = ComponentLoader;

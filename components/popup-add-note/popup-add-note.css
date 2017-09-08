@@ -1,1 +1,1 @@
-.popup{display:none;position:fixed;width:200px;left:calc(50% - 100px);top:30px;background:white}.popup_on{display:block}.mask{display:none;position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.3)}.mask_on{display:block}
+.popup-add-note__popup{display:none;position:fixed;width:200px;left:calc(50% - 100px);top:30px;background:white;z-index:9}.popup-add-note__popup_on{display:block}.popup-add-note__mask{display:none;position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.3)}.popup-add-note__mask_on{display:block}
