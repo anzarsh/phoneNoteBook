@@ -7,7 +7,12 @@
 		"popup-add-note" : "components/popup-add-note"
 	};
 
+	var modules = {
+		"noteDb" : "components/noteDb"
+	};
+
 	window.note = window.note || {};
 	window.note.components = components;
+	window.note.modules = modules;
 
 })();

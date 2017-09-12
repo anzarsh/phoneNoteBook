@@ -2,6 +2,7 @@
 	
 	var ComponentLoader = function(){
 		this.components = {};
+		this.modules = {};
 		this.customEventIE();
 	};
 
@@ -106,12 +107,39 @@
 		xhr.send(null);
 	};
 
+	ComponentLoader.prototype._loadModule = function(xhr, path){
+		var self = this;
+		xhr.open("GET", path + "/" + xhr.name + ".js", true);
+		try {
+			xhr.overrideMimeType("text/plain; charset=utf-8");
+		}catch(e){}
+		xhr.onreadystatechange = function(e){
+			if(this.readyState != 4) return;
+			if(this.status == 404){
+				self._count--;
+				self._params.warning(path + "/" + self.name + ".js" + " : " + this.status + " (" + this.statusText + ")");
+			} else if(this.status != 200){
+				self._params.error(path + "/" + self.name + ".js" + " : " + this.status + " (" + this.statusText + ")");
+			} else {
+				self.modules[this.name] = self.modules[this.name] || {};
+				self.modules[this.name].constructor = eval(this.responseText);
+				self.modules[this.name].constructor.prototype.emit = self.emit;
+				self._count--;
+				if(!self._count){
+					self._params.success();
+				}
+			}
+		};
+		xhr.send(null);
+	};
+
 	ComponentLoader.prototype.load = function(params){
 		params.processing();
 		var self = this;
 		var postfix = ["html", "css", "js"];
 		var components = params.components;
-		this._count = Object.keys(components).length * postfix.length;
+		var modules = params.modules;
+		this._count = Object.keys(components).length * postfix.length + Object.keys(modules).length;
 		this._params = params;
 		var xhr = {};
 		for (var comp in components){
@@ -133,6 +161,15 @@
 			} // end for postfix
 
 		} // end for components
+
+
+		for (var module in modules){
+				var name = module;
+				xhr[name] = new XMLHttpRequest();
+				xhr[name].name = module;
+				xhr[name].fullName = module + ".js";
+				self._loadModule(xhr[name], modules[module]);
+		}
 
 	};
 
@@ -187,21 +224,7 @@
 		}
 
 
-		//add quick links to event components
-		// var eventComponents = elem.querySelectorAll("[component-event]");
 
-		// elem.comEvents = {};
-
-		// for (var i=0; i<eventComponents.length; i++) {
-		// 	var compEventName = eventComponents[i].getAttribute("component-event");
-		// 	elem.comEvents[compEventName] = eventComponents[i];
-		// }
-
-		// if(elem.js && elem.js.addEvents)
-		// 		elem.js.addEvents();
-
-
-		//constructing componet object model (COM) tree
 		elem.comNodes = [];
 
 		elem.comNode = {};
@@ -232,6 +255,19 @@
 		
 	};
 
+	ComponentLoader.prototype.addModules = function(){
+
+		var tempModules = this.modules;
+		this.COM.modules = {};
+
+		for (var module in tempModules){
+			this.COM.modules[module] = new tempModules[module].constructor();
+			this.COM.modules[module].html = document.body;
+			this.COM.modules[module].addEvents();
+		}
+		
+	};
+
 	ComponentLoader.prototype.insertIn = function(elem){
 		
 		this.insertStyles();
@@ -241,6 +277,8 @@
 		this.insertHTML(this.COM);
 
 		this.addEvents(this.COM);
+
+		this.addModules();
 		
 	};
 

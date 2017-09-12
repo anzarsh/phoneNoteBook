@@ -6,10 +6,11 @@
 
 
 		var self = this;
-		this.db = new note.noteDb();
+		// this.db = new note.noteDb();
 		this.components = new note.ComponentLoader();
 		this.components.load({
 			components : note.components,
+			modules : note.modules,
 			processing : function(){
 
 				self._startTime = new Date();

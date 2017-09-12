@@ -1,22 +1,25 @@
 <div class="popup-add-note">
-	<div class="popup-add-note__popup" element="popup">
-		<p class="">
-			<label for="lastname">Фамилия</label>
-			<input type="text" name="lastname">
+	<form class="popup-add-note__popup" element="popup">
+		<p class="popup-add-note__section">
+			<label for="lastname" class="popup-add-note__label">Фамилия</label>
+			<input type="text" element="lastname" name="lastname" class="popup-add-note__input">
 		</p>
-		<p class="">
-			<label for="firstname">Имя</label>
-			<input type="text" name="firstname">
+		<p class="popup-add-note__section">
+			<label for="firstname" class="popup-add-note__label">Имя</label>
+			<input type="text" element="firstname" name="firstname" class="popup-add-note__input">
 		</p>
-		<p class="">
-			<label for="phone">Телефон</label>
-			<input type="text" name="phone">
+		<p class="popup-add-note__section">
+			<label for="phone" class="popup-add-note__label">Телефон</label>
+			<input type="text" element="phone" name="phone" class="popup-add-note__input">
 		</p>
-		<p class="">
-			<label for="email">Примечание<label>
-			<input type="text" name="email">
+		<p class="popup-add-note__section">
+			<label for="email" class="popup-add-note__label">Эл. почта</label>
+			<input type="text" element="email" name="email" class="popup-add-note__input">
 		</p>
-		<input type="submit" name="" value="сохранить">
-	</div>
+		<p class="popup-add-note__section">
+			<input type="submit" name="" class="popup-add-note__submit" value="сохранить">
+		</p>
+		<button class="popup-add-note__close" element="close">Закрыть</button>
+	</form>
 	<div class="popup-add-note__mask" element="mask"></div>
 </div>
