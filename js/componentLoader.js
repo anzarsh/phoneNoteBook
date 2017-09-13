@@ -1,9 +1,12 @@
 (function(){
 	
 	var ComponentLoader = function(){
+		this.html = document.body;
 		this.components = {};
 		this.modules = {};
 		this.customEventIE();
+
+		this.emit("COMInit");
 	};
 
 	/*files loaders*/
@@ -49,6 +52,7 @@
 
 				self._count--;
 				if(!self._count){
+					self.emit("COMLoadEnd");
 					self._params.success();
 				}
 			}
@@ -74,6 +78,7 @@
 				self.components[this.name].css = this.responseText;
 				self._count--;
 				if(!self._count){
+					self.emit("COMLoadEnd");
 					self._params.success();
 				}
 			}
@@ -98,8 +103,10 @@
 				self.components[this.name] = self.components[this.name] || {};
 				self.components[this.name].constructor = eval(this.responseText);
 				self.components[this.name].constructor.prototype.emit = self.emit;
+				self.components[this.name].constructor.prototype.updateData = self.updateData;
 				self._count--;
 				if(!self._count){
+					self.emit("COMLoadEnd");
 					self._params.success();
 				}
 			}
@@ -126,6 +133,7 @@
 				self.modules[this.name].constructor.prototype.emit = self.emit;
 				self._count--;
 				if(!self._count){
+					self.emit("COMLoadEnd");
 					self._params.success();
 				}
 			}
@@ -134,7 +142,11 @@
 	};
 
 	ComponentLoader.prototype.load = function(params){
+
+		this.emit("COMLoadStart");
+
 		params.processing();
+
 		var self = this;
 		var postfix = ["html", "css", "js"];
 		var components = params.components;
@@ -171,15 +183,13 @@
 				self._loadModule(xhr[name], modules[module]);
 		}
 
+		this.emit("COMLoadStarted");
+
 	};
 
 	/*files loaders*/
 
 	/*method of insert styles and html*/
-
-	ComponentLoader.prototype.setData = function(elem, data){
-		
-	};
 
 	ComponentLoader.prototype.insertStyles = function(){
 		
@@ -202,11 +212,11 @@
 
 
 		//clear components in html
-		var outerComponents = elem.querySelectorAll("[component]");
+		var componentsInDOM = elem.querySelectorAll("[component]");
 
-		for (var i=0; i<outerComponents.length; i++) {
+		for (var i=0; i<componentsInDOM.length; i++) {
 
-			var currentComponent = outerComponents[i];
+			var currentComponent = componentsInDOM[i];
 			while(currentComponent.hasChildNodes())
 				currentComponent.removeChild(currentComponent.firstChild);
 
@@ -229,16 +239,30 @@
 
 		elem.comNode = {};
 
-		for (var i=0; i<outerComponents.length; i++) {
+		for (var i=0; i<componentsInDOM.length; i++) {
 
-			var compName = outerComponents[i].getAttribute("component");
-			outerComponents[i].appendChild(components[compName].html.cloneNode(true));
-			elem.comNode[compName] = outerComponents[i].lastChild;
-			elem.comNodes.push(outerComponents[i].lastChild);
-			elem.comNode[compName].js = new components[compName].constructor();
-			elem.comNode[compName].js.html = elem.comNode[compName];
-			elem.comNode[compName].parentCom = elem;
-			this.insertHTML(outerComponents[i].lastChild);
+			var compName = componentsInDOM[i].getAttribute("component");
+			var compParamsName = componentsInDOM[i].getAttribute("component-params");
+
+			elem.js = elem.js || {}
+			elem.js.params = elem.js.params || {};
+			var params = elem.js.params[compParamsName] || [null];
+
+			for (var j=0; j<params.length; j++){
+				
+				componentsInDOM[i].appendChild(components[compName].html.cloneNode(true));
+				elem.comNode[compName] = componentsInDOM[i].lastChild;
+				elem.comNodes.push(componentsInDOM[i].lastChild);
+
+				elem.comNode[compName].js = new components[compName].constructor();
+				elem.comNode[compName].js.html = elem.comNode[compName];
+				elem.comNode[compName].parentCom = elem;
+				
+				this.insertHTML(componentsInDOM[i].lastChild);
+				elem.comNode[compName].js.updateData(params[j]);
+
+			}
+
 
 		}
 
@@ -252,7 +276,7 @@
 		for(var i=0; i<elem.comNodes.length; i++){
 			this.addEvents(elem.comNodes[i]);
 		}
-		
+
 	};
 
 	ComponentLoader.prototype.addModules = function(){
@@ -270,6 +294,8 @@
 
 	ComponentLoader.prototype.insertIn = function(elem){
 		
+		this.emit("COMRenderStart");
+
 		this.insertStyles();
 
 		this.COM = elem; // component object model
@@ -280,6 +306,20 @@
 
 		this.addModules();
 		
+		this.emit("COMRenderEnd");
+
+	};
+
+	ComponentLoader.prototype.updateComponent = function(elem){
+		
+		this.emit("COMUpdateStart", elem);
+
+		this.insertHTML(elem);
+
+		this.addEvents(this.COM);
+
+		this.emit("COMUpdateEnd", elem);
+
 	};
 
 	/*method of insert styles and html-components*/
@@ -308,7 +348,7 @@
 	};
 
 	ComponentLoader.prototype.emit = function(eventName, data){
-	  return this.html.dispatchEvent(new CustomEvent(eventName, {
+		return this.html.dispatchEvent(new CustomEvent(eventName, {
 	  	bubbles: true,
 	  	cancelable: true,
 	  	detail: data
@@ -317,6 +357,18 @@
 
 	/*adds custom events for ie9-11*/
 
+
+
+	/*methods for components*/
+
+	ComponentLoader.prototype.updateData = function(data){
+		if(!data) return;
+		for(var elemData in data){
+			this.html.elements[elemData].textContent = data[elemData];
+		}
+	};
+
+	/*methods for components*/
 
 
 	window.note = window.note || {};

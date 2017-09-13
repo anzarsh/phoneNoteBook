@@ -36,9 +36,13 @@
 	NoteList.prototype.addEvents = function(){
 
 		document.addEventListener("note-list__search", function(e){
-			console.log(e.detail);
+			// console.log(e.detail);
 		}, false);
 
+		document.addEventListener("noteDb__notes", function(e){
+			console.log(e.detail);
+		});
+		
 	};
 
 	return NoteList;

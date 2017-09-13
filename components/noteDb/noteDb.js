@@ -29,7 +29,7 @@
 
 		document.addEventListener("noteDb__get", function(e){
 			self.get(1, 10, function(result){
-				self.emit("noteDb__get_result", result);
+				self.emit("noteDb__notes", result);
 			});
 		});
 

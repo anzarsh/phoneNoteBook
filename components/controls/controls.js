@@ -25,10 +25,6 @@
 			self.emit("popup-add-note__open");
 		};
 
-		document.addEventListener("noteDb__get_result", function(e){
-			console.log(e.detail);
-		});
-
 	};
 
 	return Controls;
