@@ -6,7 +6,6 @@
 
 
 		var self = this;
-		// this.db = new note.noteDb();
 
 		document.addEventListener("COMInit", function(e){
 			console.log("COMInit");
@@ -33,23 +32,21 @@
 		});
 
 
-		this.components = new note.ComponentLoader();
+		this.components = new lib.ComponentLoader();
 		this.components.load({
-			components : note.components,
-			modules : note.modules,
+			components : lib.components,
+			modules : lib.modules,
 			processing : function(){
-
 				self._startTime = new Date();
 				
 				console.log("processing");
 			},
 			success : function(){
-				self.components.insertIn(document.body);
+				self.components.insertInDOM(document.body);
 				console.log("success");
 
 				self._loadedTime = new Date();
-				console.log(self._loadedTime - self._startTime);
-
+				console.log(self._loadedTime - self._startTime + "ms");
 			},
 			error : function(e){
 				console.error(e);
@@ -59,15 +56,6 @@
 			}
 		});
 
-		
-
-		// document.addEventListener("COMRenderStart", function(e){
-		// 	console.log("COMRenderStart");
-		// });
-
-		// document.addEventListener("COMRenderStart", function(e){
-		// 	console.log("COMRenderStart");
-		// });
 
 
 	};

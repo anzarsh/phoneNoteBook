@@ -8,11 +8,11 @@
 	};
 
 	var modules = {
-		"noteDb" : "components/noteDb"
+		"noteDb" : "modules/noteDb"
 	};
 
-	window.note = window.note || {};
-	window.note.components = components;
-	window.note.modules = modules;
+	window.lib = window.lib || {};
+	window.lib.components = components;
+	window.lib.modules = modules;
 
 })();
