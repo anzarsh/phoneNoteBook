@@ -3,7 +3,7 @@
 }
 
 .note__item {
-	padding: 15px;
+	padding: 5px;
 	background: #ccc;
 	border-right: 1px solid white;
 	border-left: 1px solid white;
@@ -15,4 +15,15 @@
 	&:last-child {
 		border-right: 0;
 	}
+}
+
+.note__input {
+	background: transparent;
+	width: 100%;
+	font: 1rem/1.2 Arial, sans-serif;
+	padding: 10px;
+}
+
+.note__input:focus {
+	background: white;
 }

@@ -42,7 +42,7 @@
 				console.log("processing");
 			},
 			success : function(){
-				self.components.insertInDOM(document.body);
+				self.components.insertComponents(document.body);
 				console.log("success");
 
 				self._loadedTime = new Date();

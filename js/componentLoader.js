@@ -172,6 +172,8 @@
 					.emit = self.emit;
 				self.components[this.name].constructor.prototype
 					.updateData = self.updateData;
+				self.components[this.name].constructor.prototype
+					.setParams = self.setParams;
 				self._count--;
 				if(!self._count) {
 					self.emit("COMLoadEnd");
@@ -221,7 +223,7 @@
 
 	/*method of insert styles and html*/
 
-	ComponentLoader.prototype.insertInDOM = function(elem) {
+	ComponentLoader.prototype.insertComponents = function(elem) {
 		this.emit("COMRenderStart");
 
 		this.insertStyles();
@@ -230,7 +232,7 @@
 
 		this.insertHTML(this.COM);
 
-		this.addEvents(this.COM);
+		this.addComponentsEvents(this.COM);
 
 		this.addModules();
 		
@@ -251,21 +253,21 @@
 	};
 
 	ComponentLoader.prototype.insertHTML = function(elem) {
-		var components = this.components;
-		var componentsInDOM = elem.querySelectorAll("[component]");
+		var componentTemplates = this.components;
+		var componentsInElem = elem.querySelectorAll("[component]");
 
-		this.clearComponents(componentsInDOM);
+		this.clearComponents(componentsInElem);
 
 		this.addQuickLinks(elem);
 
 		elem.comNodes = [];
 		elem.comNode = {};
 
-		for (var i=0; i<componentsInDOM.length; i++) {
+		for (var i=0; i<componentsInElem.length; i++) {
 
-			var compName = componentsInDOM[i]
+			var compName = componentsInElem[i]
 											.getAttribute("component");
-			var compParamsName = componentsInDOM[i]
+			var compParamsName = componentsInElem[i]
 											.getAttribute("component-params");
 
 			elem.js = elem.js || {}
@@ -274,16 +276,18 @@
 
 			for (var j=0; j<params.length; j++){
 				
-				componentsInDOM[i].appendChild(
-					components[compName].html.cloneNode(true));
-				elem.comNode[compName] = componentsInDOM[i].lastChild;
-				elem.comNodes.push(componentsInDOM[i].lastChild);
+				componentsInElem[i].appendChild(
+					componentTemplates[compName].html.cloneNode(true));
+				elem.comNode[compName] = componentsInElem[i].lastChild;
+				elem.comNodes.push(componentsInElem[i].lastChild);
 
-				elem.comNode[compName].js = new components[compName].constructor();
+				elem.comNode[compName].js = 
+								new componentTemplates[compName].constructor();
+				elem.comNode[compName].js.componentLoader = this;
 				elem.comNode[compName].js.html = elem.comNode[compName];
 				elem.comNode[compName].parentCom = elem;
 				
-				this.insertHTML(componentsInDOM[i].lastChild);
+				this.insertHTML(componentsInElem[i].lastChild);
 				elem.comNode[compName].js.updateData(params[j]);
 
 			}
@@ -291,10 +295,10 @@
 		}
 	};
 
-	ComponentLoader.prototype.clearComponents = function(componentsInDOM) {
-		for (var i=0; i<componentsInDOM.length; i++) {
+	ComponentLoader.prototype.clearComponents = function(components) {
+		for (var i=0; i<components.length; i++) {
 
-			var currentComponent = componentsInDOM[i];
+			var currentComponent = components[i];
 			while(currentComponent.hasChildNodes())
 				currentComponent.removeChild(currentComponent.firstChild);
 
@@ -312,12 +316,12 @@
 		}
 	};
 
-	ComponentLoader.prototype.addEvents = function(elem) {
+	ComponentLoader.prototype.addComponentsEvents = function(elem) {
 		if(elem.js && elem.js.addEvents)
 			elem.js.addEvents();
 
 		for(var i=0; i<elem.comNodes.length; i++){
-			this.addEvents(elem.comNodes[i]);
+			this.addComponentsEvents(elem.comNodes[i]);
 		}
 	};
 
@@ -332,18 +336,66 @@
 		}
 	};
 
+	/*method of insert styles and html-components*/
+
+
+
+	/*method of updating html-components*/
 
 	ComponentLoader.prototype.updateComponent = function(elem) {
 		this.emit("COMUpdateStart", elem);
 
-		this.insertHTML(elem);
+		this.updateHTML(elem);
 
-		this.addEvents(this.COM);
+		this.addComponentsEvents(elem);
 
 		this.emit("COMUpdateEnd", elem);
 	};
 
-	/*method of insert styles and html-components*/
+	ComponentLoader.prototype.updateHTML = function(elem) {
+		var componentTemplates = this.components;
+		var componentsInElem = elem.querySelectorAll("[component]");
+
+		this.clearComponents(componentsInElem);
+
+		this.addQuickLinks(elem);
+
+		elem.comNodes = [];
+		elem.comNode = {};
+
+		for (var i=0; i<componentsInElem.length; i++) {
+
+			var compName = componentsInElem[i]
+											.getAttribute("component");
+			var compParamsName = componentsInElem[i]
+											.getAttribute("component-params");
+
+			elem.js = elem.js || {}
+			elem.js.params = elem.js.params || {};
+			var params = elem.js.params[compParamsName] || [null];
+
+			for (var j=0; j<params.length; j++){
+				
+				componentsInElem[i].appendChild(
+					componentTemplates[compName].html.cloneNode(true));
+				elem.comNode[compName] = componentsInElem[i].lastChild;
+				elem.comNodes.push(componentsInElem[i].lastChild);
+
+				elem.comNode[compName].js = 
+								new componentTemplates[compName].constructor();
+				elem.comNode[compName].js.componentLoader = this;
+				elem.comNode[compName].js.html = elem.comNode[compName];
+				elem.comNode[compName].parentCom = elem;
+				
+				this.updateHTML(componentsInElem[i].lastChild);
+				elem.comNode[compName].js.updateData(params[j]);
+
+			}
+
+		}
+	};
+
+	/*method of updating html-components*/
 
 
 
@@ -351,7 +403,8 @@
 
 	ComponentLoader.prototype.addCustomEventIE = function() {
 		try {
-			new CustomEvent("IE has CustomEvent, but doesn't support constructor");
+			new CustomEvent(
+				"IE has CustomEvent, but doesn't support constructor");
 		} catch (e) {
 			window.CustomEvent = function(event, params) {
 			var evt;
@@ -387,11 +440,58 @@
 
 	/*methods for adding in component's prototype*/
 
-	ComponentLoader.prototype.updateData = function(data) {
-		if(!data) return;
-		for(var elemData in data){
-			this.html.elements[elemData].textContent = data[elemData];
+	ComponentLoader.prototype.updateData = function(params) {
+		if(!params) return;
+
+		for(var elemParams in params){
+			if(this.html.elements[elemParams]) {
+			
+				if(params[elemParams] === null) {
+
+					this.html.elements[elemParams].textContent = "";
+
+				} else if(typeof params[elemParams] !== "object" &&
+									typeof params[elemParams] !== "array") {
+
+					this.html.elements[elemParams].textContent = 
+																								params[elemParams];
+
+				} else if(typeof params[elemParams] === "object"){
+					
+					var attrs = params[elemParams];
+					for(var attr in attrs) {
+						if(attr == "text"){
+							this.html.elements[elemParams].textContent = attrs[attr];
+						} else {
+							this.html.elements[elemParams]
+								.setAttribute(attr, attrs[attr]);
+						}
+					}
+
+				} // if-else-if end
+
+			} else if(elemParams == "html" &&
+								typeof params[elemParams] === "object") {
+				var attrs = params[elemParams];
+				for(var attr in attrs) {
+					this.html.setAttribute(attr, attrs[attr]);
+				}
+			}
+			
+		} // for end
+
+	};
+
+	ComponentLoader.prototype.setParams = function(params) {
+		if(!params) return;
+
+		this.params = this.params || {};
+
+		for(var param in params){
+			this.params[param] = params[param];
 		}
+
+		this.componentLoader.updateComponent(this.html);
 	};
 
 	/*methods for adding in component's prototype*/

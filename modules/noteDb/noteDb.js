@@ -13,6 +13,7 @@
 		};
 		openRequest.onsuccess = function(e){
 			self._db = e.target.result;
+			self.emit("noteDb__DBCreated");
 		};
 		openRequest.onerror = function(e){
 			var err = e.target.error;
@@ -30,6 +31,8 @@
 		document.addEventListener("noteDb__get", function(e){
 			self.get(1, 10, function(result){
 				self.emit("noteDb__notes", result);
+			}, function(error){
+				console.error(error);
 			});
 		});
 
@@ -47,6 +50,8 @@
 			var start = nth;
 			var end = nth + num;
 			if(cursor && start<end){
+				var value = cursor.value;
+				value.id = cursor.key;
 				result.push(cursor.value);
 				start++;
 				cursor.continue();
