@@ -9,6 +9,7 @@
 	border-left: 1px solid white;
 	border-bottom: 1px solid white;
 	font: 1rem/1 Arial, sans-serif;
+	vertical-align: middle;
 	&:first-child {
 		border-left: 0;
 	}
@@ -26,4 +27,14 @@
 
 .note__input:focus {
 	background: white;
+}
+
+.note__button {
+	background: transparent;
+	font: 1rem/1.2 Arial, sans-serif;
+	display: block;
+	text-align: center;
+	margin: 0 auto;
+	padding: 5px;
+	cursor: pointer;
 }

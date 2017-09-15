@@ -1,7 +1,8 @@
 (function(){
 	
 	var NoteList = function() {
-
+		this.notesInPage = 10;
+		this.currentPage = 0;
 	};
 
 	NoteList.prototype.addEvents = function() {
@@ -18,14 +19,20 @@
 		document.addEventListener("COMRenderEnd", function(e){
 			firstDBRequest--;
 			if(!firstDBRequest){
-				self.emit("noteDb__get");
+				self.emit("noteDb__get", {
+					start : self.currentPage * self.notesInPage,
+					end : (self.currentPage + 1) * self.notesInPage
+				});
 			}
 		});
 
 		document.addEventListener("noteDb__DBCreated", function(e){
 			firstDBRequest--;
 			if(!firstDBRequest){
-				self.emit("noteDb__get");
+				self.emit("noteDb__get", {
+					start : self.currentPage * self.notesInPage,
+					end : (self.currentPage + 1) * self.notesInPage
+				});
 			}
 		});
 		/**/
@@ -38,6 +45,13 @@
 			});
 		});
 		
+		document.addEventListener("noteDb__changed", function(e) {
+			self.emit("noteDb__get", {
+				start : self.currentPage * self.notesInPage,
+				end : (self.currentPage + 1) * self.notesInPage
+			});
+		});
+
 	};
 
 	NoteList.prototype.packParams = function(params) {

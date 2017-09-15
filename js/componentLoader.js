@@ -285,6 +285,7 @@
 								new componentTemplates[compName].constructor();
 				elem.comNode[compName].js.componentLoader = this;
 				elem.comNode[compName].js.html = elem.comNode[compName];
+				elem.comNode[compName].js.params = { self : params[j] };
 				elem.comNode[compName].parentCom = elem;
 				
 				this.insertHTML(componentsInElem[i].lastChild);
@@ -385,10 +386,11 @@
 								new componentTemplates[compName].constructor();
 				elem.comNode[compName].js.componentLoader = this;
 				elem.comNode[compName].js.html = elem.comNode[compName];
+				elem.comNode[compName].js.params = { self : params[j] };
 				elem.comNode[compName].parentCom = elem;
 				
 				this.updateHTML(componentsInElem[i].lastChild);
-				elem.comNode[compName].js.updateData(params[j]);
+				elem.comNode[compName].js.updateData();
 
 			}
 
@@ -440,7 +442,8 @@
 
 	/*methods for adding in component's prototype*/
 
-	ComponentLoader.prototype.updateData = function(params) {
+	ComponentLoader.prototype.updateData = function() {
+		var params = this.params.self || null;
 		if(!params) return;
 
 		for(var elemParams in params){
@@ -479,7 +482,6 @@
 			}
 			
 		} // for end
-
 	};
 
 	ComponentLoader.prototype.setParams = function(params) {
@@ -492,6 +494,11 @@
 		}
 
 		this.componentLoader.updateComponent(this.html);
+	};
+
+	ComponentLoader.prototype.updateParams = function(params) {
+		this.params.self = { self : params};
+		this.updateData();
 	};
 
 	/*methods for adding in component's prototype*/
