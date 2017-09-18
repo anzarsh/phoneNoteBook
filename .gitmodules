@@ -1,0 +1,3 @@
+[submodule "lib/component-loader"]
+	path = lib/component-loader
+	url = https://github.com/anzarsh/component-loader.git
