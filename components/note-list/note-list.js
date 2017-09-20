@@ -50,7 +50,8 @@
 				start : self.currentPage * self.notesInPage,
 				end : (self.currentPage + 1) * self.notesInPage
 			});
-		});
+			return false;
+		}, false);
 
 	};
 

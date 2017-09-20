@@ -8,7 +8,6 @@
 		var self = this;
 
 		this.html.elements.change.onclick = function(e) {
-			console.log("this.html.elements.change.onclick");
 			var id = self.params.self.html.noteId;
 			var sendData = {
 				key : id,
@@ -24,9 +23,7 @@
 
 		this.html.elements.delete.onclick = function(e) {
 			var id = self.params.self.html.noteId;
-			console.log(id);
 			self.emit("noteDb__delete", id);
-
 		};
 
 	};

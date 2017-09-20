@@ -26,6 +26,7 @@
 
 		document.addEventListener("noteDb__add", function(e) {
 			self.add(e.detail, function(e){
+				console.log("emit - noteDb__changed");
 				self.emit("noteDb__changed");
 			});
 		});
