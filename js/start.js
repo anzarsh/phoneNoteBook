@@ -47,6 +47,8 @@
 
 				self._loadedTime = new Date();
 				console.log(self._loadedTime - self._startTime + "ms");
+				console.log(performance.now() + "ms");
+				
 			},
 			error : function(e){
 				console.error(e);
